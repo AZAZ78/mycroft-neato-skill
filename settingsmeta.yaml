@@ -1,22 +1,19 @@
 
 skillMetadata:
   sections:
-    - name: Options << Name of section
-      fields:
-        - name: internal_python_variable_name
-          type: text
-          label: Setting Friendly Display Name
-          value: ""
-          placeholder: demo prompt in the input box
-    - name: Login << Name of another section
+    - name: Credentials
       fields:
         - type: label
-          label: Just a little bit of extra info for the user to understand following settings
-        - name: username
+          label: You can specify the access settings of your vacuum cleaner robot here (comfortable) or locally in the skill directory via credetials.py (secure). If you do not know this info, run getcredentials.py in the skill directory.
+        - name: name
           type: text
-          label: Username
+          label: Name of your robot
           value: ""
-        - name: password
+        - name: serial
+          type: text
+          label: Serialnumber of your robot
+          value: ""
+        - name: secret
           type: password
-          label: Password
+          label: Secret of your robot
           value: ""

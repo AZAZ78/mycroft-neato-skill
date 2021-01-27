@@ -17,3 +17,11 @@ skillMetadata:
           type: password
           label: Secret of your robot
           value: ""
+    - name: Rooms
+      fields:
+        - type: label
+          label: You can optionally specify explicit rooms here. You can get available maps via executing getmapids.py in the skill directory.
+        - name: rooms
+          type: text
+          label: Room Configuration
+          value: "{'wohnzimmer|wohnen': '2020-05-03T08:10:46Z'}"

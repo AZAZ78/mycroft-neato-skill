@@ -3,6 +3,8 @@ import base64
 
 from pybotvac import Robot
 
+import yaml
+
 from os import listdir, path  # makedirs, remove,
 from os.path import dirname, join  # exists, expanduser, isfile, abspath, isdir
 
@@ -18,8 +20,14 @@ class NeatoSkill(MycroftSkill):
         self.robot_name = ""
         self.robot_serial = ""
         self.robot_secret = ""
+        self._rooms = None
 
     def initialize(self):
+        
+        rooms = self.settings.get('rooms')
+        if rooms is not None:
+            self._rooms = yaml.safe_load(self.settings.get('rooms'))
+
         # handle credentials
         credentials = self._load_credentials_store()
         if credentials:
@@ -42,10 +50,12 @@ class NeatoSkill(MycroftSkill):
                             .require("RobotName")\
                             .require("neato.action.stop")\
                             .build(), self.handle_neato_stop)
+        return
 
     def on_websettings_changed(self):
         # Force a setting refresh after the websettings changed
         # Otherwise new settings will not be regarded
+        self._rooms = yaml.safe_load(self.settings.get('rooms'))
         return
 
     @intent_handler(IntentBuilder("NeatoStartDefaultIntent")
@@ -53,12 +63,22 @@ class NeatoSkill(MycroftSkill):
                               .require("neato.action.start"))
     def handle_neato_start(self, message):
         self.log.info ("Handle Neato start")
+        utterance = message.data.get('utterance')
+        self.log.info ("Utterance: {}".format(utterance))
+
         robot = Robot(self.robot_serial, self.robot_secret, self.robot_name)
         if robot is None:
             self.log.warning ("robot is none")
             self.speak_dialog('neato.error', data={"name": self.robot_name})
             return
-        robot.start_cleaning()
+        map_id = _get_map(utterance, self._rooms)
+        if map_id is None:
+            self.log.info ("Start cleaning")
+            robot.start_cleaning()
+        else:
+            self.log.info ("Start cleaning map {}".format(map_id))
+            robot.start_cleaning(category=4, map_id=map_id)
+
         self.speak_dialog('neato.success', data={"name": self.robot_name})
         return
 
@@ -72,7 +92,8 @@ class NeatoSkill(MycroftSkill):
             self.log.warning ("robot is none")
             self.speak_dialog('neato.error', data={"name": self.robot_name})
             return
-        robot.stop_cleaning()
+        #robot.stop_cleaning()
+        robot.send_to_base()
         self.speak_dialog('neato.success.stop', data={"name": self.robot_name})
         return
 
@@ -95,6 +116,20 @@ class NeatoSkill(MycroftSkill):
                 if key != "Default":
                     self.register_vocabulary(key, nameset)
         return True
+
+    def _get_map(self, text, rooms):
+        default = None
+        for keys, target in entities.items():
+            for key in keys.split("|"):
+                if key in text:
+                    self.log.debug ("Found {} in {}".format(key, text))
+                    return target
+                if key == 'default':
+                    default = target
+        if default is not None:
+            self.log.debug ("Found no key but default")
+            return default
+        return None
 
 def create_skill():
     return NeatoSkill()

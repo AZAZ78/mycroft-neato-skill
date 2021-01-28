@@ -71,7 +71,7 @@ class NeatoSkill(MycroftSkill):
             self.log.warning ("robot is none")
             self.speak_dialog('neato.error', data={"name": self.robot_name})
             return
-        map_id = _get_map(utterance, self._rooms)
+        map_id = self._get_map(utterance, self._rooms)
         if map_id is None:
             self.log.info ("Start cleaning")
             robot.start_cleaning()
@@ -119,7 +119,7 @@ class NeatoSkill(MycroftSkill):
 
     def _get_map(self, text, rooms):
         default = None
-        for keys, target in entities.items():
+        for keys, target in rooms.items():
             for key in keys.split("|"):
                 if key in text:
                     self.log.debug ("Found {} in {}".format(key, text))

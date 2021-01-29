@@ -4,7 +4,7 @@ skillMetadata:
     - name: Credentials
       fields:
         - type: label
-          label: You can specify the access settings of your vacuum cleaner robot here (comfortable) or locally in the skill directory via credetials.py (secure). If you do not know this info, run getcredentials.py in the skill directory.
+          label: You can specify the access settings of your vacuum cleaner robot here (comfortable) or locally in the skill directory via credentials.py (secure). If you do not know this info, run getcredentials.py in the skill directory to list all your available robots.
         - name: name
           type: text
           label: Name of your robot

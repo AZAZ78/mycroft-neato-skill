@@ -14,5 +14,5 @@ sec = base64.b64encode(str(input('Your client secret: ')).encode('ascii'))
 
 credentials = {'n': n, 'snr': snr, 'sec': sec}
 
-with open('/opt/mycroft/skills/neato-skill/credentials.store', 'wb') as f:
+with open('/opt/mycroft/skills/mycroft-neato-skill.azaz78/credentials.store', 'wb') as f:
     pickle.dump(credentials, f, pickle.HIGHEST_PROTOCOL)

@@ -13,7 +13,7 @@ If you want to clean explicit rooms with NoGo Lines, you have to specify them in
 ## Examples
 * "tell Neato to start cleaning"
 * "tell the robot to clean the living room"
-* "tell <name of your robot> to clean"
+* "tell 'name of your robot' to clean"
 
 ## Credits
 Alexander Zeh (@azaz78)

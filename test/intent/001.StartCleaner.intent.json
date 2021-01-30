@@ -1,0 +1,5 @@
+{
+  "utterance": "starte den sauger",
+  "intent_type": "NeatoStartDefaultIntent",
+  "expected_dialog": "neato.success"
+}

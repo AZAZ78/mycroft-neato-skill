@@ -16,14 +16,13 @@ __author__ = 'azaz78'
 
 class NeatoSkill(MycroftSkill):
     def __init__(self):
-        super().__init__(name="NeatoSkill")
+        MycroftSkill.__init__(self)
         self.robot_name = ""
         self.robot_serial = ""
         self.robot_secret = ""
         self._rooms = None
 
-    def initialize(self):
-        
+    def initialize(self, web_update = False):
         rooms = self.settings.get('rooms')
         if rooms is not None:
             self._rooms = yaml.safe_load(self.settings.get('rooms'))
@@ -39,23 +38,28 @@ class NeatoSkill(MycroftSkill):
             self.robot_serial = self.settings.get("serial", "")
             self.robot_secret = self.settings.get("secret", "")
         
-        self.log.info ("Loaded credentials for {}".format(self.robot_name))
+        if self.robot_name:
+            self.log.info ("Loaded credentials for {}".format(self.robot_name))
         
-        self.register_vocabulary(self.robot_name, "RobotName")
-        self.register_intent(IntentBuilder("NeatoStartIntent")\
-                            .require("RobotName")\
-                            .require("neato.action.start")\
-                            .build(), self.handle_neato_start)
-        self.register_intent(IntentBuilder("NeatoStopIntent")\
-                            .require("RobotName")\
-                            .require("neato.action.stop")\
-                            .build(), self.handle_neato_stop)
+            if web_update is False: 
+                self.register_vocabulary(self.robot_name, "RobotName")
+                self.register_intent(IntentBuilder("NeatoStartIntent")\
+                                .require("RobotName")\
+                                .require("neato.action.start")\
+                                .build(), self.handle_neato_start)
+                self.register_intent(IntentBuilder("NeatoStopIntent")\
+                                .require("RobotName")\
+                                .require("neato.action.stop")\
+                                .build(), self.handle_neato_stop)
+        else:
+           self.log.warning("Loading credentials failed")
+           self.speak_dialog('neato.error.connect')
         return
 
     def on_websettings_changed(self):
         # Force a setting refresh after the websettings changed
         # Otherwise new settings will not be regarded
-        self._rooms = yaml.safe_load(self.settings.get('rooms'))
+        self.initialize(True)
         return
 
     @intent_handler(IntentBuilder("NeatoStartDefaultIntent")
@@ -98,14 +102,11 @@ class NeatoSkill(MycroftSkill):
         return
 
     def _load_credentials_store(self):
-        credentials = {}
-        skill_dir = dirname(__file__)
+        credentials = None
         credentials_file = 'credentials.store'
-        if path.exists(skill_dir):
-            file_list = listdir(skill_dir)
-            if credentials_file in file_list:
-                with open(skill_dir + '/' + credentials_file, 'rb') as f:
-                    credentials = pickle.load(f)
+        if self.file_system.exists(credentials_file):
+            with self.file_system.open(credentials_file, 'rb') as f:
+                credentials = pickle.load(f)
         return credentials
 
     def _register_voc(self, entities, nameset):

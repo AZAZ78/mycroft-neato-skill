@@ -1,5 +1,5 @@
 {
-  "utterance": "activate the cleaner",
+  "utterance": "activate the vacuum cleaner",
   "intent_type": "NeatoStartDefaultIntent",
   "expected_dialog": "neato.error"
 }

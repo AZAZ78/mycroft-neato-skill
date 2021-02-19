@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-import re
 import base64
 import pickle
+import json
 from os.path import join
 from mycroft.filesystem import FileSystemAccess
 from pybotvac import Account, Neato, PasswordSession, Robot
@@ -24,19 +24,16 @@ account = Account(password_session)
 print('---------------------------------------------------------------------------------------------------------')
 # List all robots associated with account
 for robot in account.robots:
-    print(robot)
+    print('Robot: {}'.format(robot.name))
 print('---------------------------------------------------------------------------------------------------------')
 
 myRobot = str(input('Please type the name of the robot you want to configure (None): ') or 'None') 
 if myRobot != 'None':
-    # Unfortunatly the pybotvac library has no easy access for the robots data, so parse it manually from the objects string
-    reg = re.compile('Name: (?P<Name>[^, ]*).*Serial: (?P<Serial>[^, ]*).*Secret: (?P<Secret>[^, ]*)')
     for robot in account.robots:
-       match = reg.match(str(robot))
-       if match.group('Name') == myRobot:
-           n = base64.b64encode(str(match.group('Name')).encode('ascii'))
-           snr = base64.b64encode(str(match.group('Serial')).encode('ascii'))
-           sec = base64.b64encode(str(match.group('Secret')).encode('ascii'))
+       if robot.name == myRobot:
+           n = base64.b64encode(robot.name.encode('ascii'))
+           snr = base64.b64encode(robot.serial.encode('ascii'))
+           sec = base64.b64encode(robot.secret.encode('ascii'))
 
            credentials = {'n': n, 'snr': snr, 'sec': sec}
 
@@ -45,7 +42,26 @@ if myRobot != 'None':
            with file_system.open('credentials.store', 'wb') as f:
                pickle.dump(credentials, f, pickle.HIGHEST_PROTOCOL)
 
-           print('Created credentials.store in {}'.format(file_system.path))
+           print('Name: {}'.format(robot.name))
+           print('Serial: {}'.format(robot.serial))
+           print('Secret: {}'.format(robot.secret))
+           print('Created credentials.store for {} in {}'.format(robot.name, file_system.path))
+          
+           # Dump possible room configuration
+           dummy = account.maps
+           persMaps = account.persistent_maps
+           if robot.serial in persMaps:
+                maps = {}
+                myRobotsMaps = persMaps[robot.serial]
+                for mapData in myRobotsMaps:
+                    maps[mapData['name']] = mapData['id']
+           
+                with file_system.open('rooms.store', 'w') as f:
+                    json.dump(maps, f)
+                
+                print(maps) 
+                print('Created rooms.store for {} in {}'.format(robot.name, file_system.path))
+
            exit() 
 
 print('No credentials saved')

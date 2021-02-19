@@ -4,23 +4,23 @@ skillMetadata:
     - name: Credentials
       fields:
         - type: label
-          label: You can specify the access settings of your vacuum cleaner robot here (comfortable) or locally in the skill directory via credentials.py (secure). If you do not know this info, run getcredentials.py in the skill directory to list all your available robots.
+          label: You can specify the access settings of your vacuum cleaner robot here (comfortable) or locally in the skill directory via credentials.py (secure).
         - name: name
           type: text
           label: Name of your robot
           value: ""
-        - name: serial
+        - name: login 
           type: text
-          label: Serialnumber of your robot
+          label: Your Neato login
           value: ""
-        - name: secret
+        - name: passwd 
           type: password
-          label: Secret of your robot
+          label: Your Neato password
           value: ""
     - name: Rooms
       fields:
         - type: label
-          label: You can optionally specify explicit rooms here. You can get available maps via executing getmapids.py in the skill directory.
+          label: You can optionally specify explicit rooms here. This will override local configuration created automatically via credentials.py.
         - name: rooms
           type: text
           label: Room Configuration

@@ -1,5 +1,5 @@
 {
   "utterance": "activate the cleaner",
   "intent_type": "NeatoStartDefaultIntent",
-  "expected_dialog": "neato.success"
+  "expected_dialog": "neato.error"
 }

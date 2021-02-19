@@ -1,12 +1,8 @@
 import pickle
 import base64
-
-from pybotvac import Robot
-
 import yaml
 
-from os import listdir, path  # makedirs, remove,
-from os.path import dirname, join  # exists, expanduser, isfile, abspath, isdir
+from pybotvac import Robot
 
 from mycroft import MycroftSkill, intent_handler
 from adapt.intent import IntentBuilder

@@ -18,7 +18,16 @@ class NeatoSkill(MycroftSkill):
         self.robot_secret = ""
         self._rooms = None
 
-    def initialize(self, web_update = False):
+    def initialize(self):
+        self.settings_change_callback = self.on_websettings_changed
+        self.setup()
+
+    def on_websettings_changed(self):
+        # Force a setting refresh after the websettings changed
+        # Otherwise new settings will not be regarded
+        self.setup(True)
+
+    def setup(self, web_update = False):
         # handle credentials
         credentials = self._load_credentials_store()
         if credentials:
@@ -51,12 +60,6 @@ class NeatoSkill(MycroftSkill):
         else:
            self.log.warning("Loading credentials failed")
            self.speak_dialog('neato.error.connect')
-        return
-
-    def on_websettings_changed(self):
-        # Force a setting refresh after the websettings changed
-        # Otherwise new settings will not be regarded
-        self.initialize(True)
         return
 
     @intent_handler(IntentBuilder("NeatoStartDefaultIntent")

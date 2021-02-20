@@ -12,6 +12,7 @@
  dependencies:
    # Pip dependencies on PyPI
    python:
+     - dataclasses
      - pybotvac
 #
 #   # Install packages with the system package manager

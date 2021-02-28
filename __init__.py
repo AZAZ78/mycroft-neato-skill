@@ -75,14 +75,31 @@ class NeatoSkill(MycroftSkill):
             self.log.warning ("robot is none")
             self.speak_dialog('neato.error', data={"name": self.robot_name})
             return
-        map_id = self._get_map(utterance, self._rooms)
+        map_id, map_name = self._get_map(utterance, self._rooms)
         if map_id is None:
             self.log.info ("Start cleaning")
             robot.start_cleaning()
+            self.speak_dialog('neato.success', data={"name": self.robot_name})
         else:
             self.log.info ("Start cleaning map {}".format(map_id))
             robot.start_cleaning(category=4, map_id=map_id)
+            self.speak_dialog('neato.success.room', data={"name": self.robot_name, "room": map_name})
 
+        return
+
+    @intent_handler(IntentBuilder("NeatoStartSpotIntent")
+                              .require("neato.robot")
+                              .require("neato.action.start")
+                              .require("neato.spot"))
+    def handle_neato_start_spot(self, message):
+        self.log.info ("Handle Neato start spot")
+        robot = Robot(self.robot_serial, self.robot_secret, self.robot_name)
+        if robot is None:
+            self.log.warning ("robot is none")
+            self.speak_dialog('neato.error', data={"name": self.robot_name})
+            return
+        self.log.info ("Start cleaning")
+        robot.start_spot_cleaning()
         self.speak_dialog('neato.success', data={"name": self.robot_name})
         return
 
@@ -143,17 +160,20 @@ class NeatoSkill(MycroftSkill):
         return True
 
     def _get_map(self, text, rooms):
-        default = None
+        default_id = None
+        default_name = None
         for keys, target in rooms.items():
-            for key in keys.split("|"):
+            splitted_keys = keys.split("|")
+            for key in splitted_keys:
                 if key in text:
                     self.log.debug ("Found {} in {}".format(key, text))
-                    return target
+                    return target, key
                 if key == 'default':
-                    default = target
-        if default is not None:
+                    default_id = target
+                    default_name = splitted_keys[0]
+        if default_id is not None:
             self.log.debug ("Found no key but default")
-            return default
+            return default_id, default_name
         return None
 
 def create_skill():

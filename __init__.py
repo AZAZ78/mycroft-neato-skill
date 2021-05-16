@@ -29,17 +29,21 @@ class NeatoSkill(MycroftSkill):
 
     def setup(self, web_update = False):
         # handle credentials
-        credentials = self._load_credentials_store()
-        if credentials:
-            self.robot_name = str((base64.b64decode(credentials['n'])).decode('ascii'))
-            self.robot_serial = str((base64.b64decode(credentials['snr'])).decode('ascii'))
-            self.robot_secret = str((base64.b64decode(credentials['sec'])).decode('ascii'))
-            self._rooms = self._load_rooms_store()
-        else:
-            login = self.settings.get("login", "")
-            passwd = self.settings.get("passwd", "")
-            self.robot_name = self.settings.get("name", "")
-            self.robot_serial, self.robot_secret, self._rooms = self._get_credentials_and_rooms(self.robot_name, login, passwd)
+        try:
+            credentials = self._load_credentials_store()
+            if credentials:
+                self.robot_name = str((base64.b64decode(credentials['n'])).decode('ascii'))
+                self.robot_serial = str((base64.b64decode(credentials['snr'])).decode('ascii'))
+                self.robot_secret = str((base64.b64decode(credentials['sec'])).decode('ascii'))
+                self._rooms = self._load_rooms_store()
+            else:
+                login = self.settings.get("login", "")
+                passwd = self.settings.get("passwd", "")
+                self.robot_name = self.settings.get("name", "")
+                if login:
+                    self.robot_serial, self.robot_secret, self._rooms = self._get_credentials_and_rooms(self.robot_name, login, passwd)
+        except Exception as ex:
+           self.log.warning("Exception during loading credentials:", err)
         
         if self.robot_serial:
             self.log.info ("Loaded credentials for {}".format(self.robot_name))
